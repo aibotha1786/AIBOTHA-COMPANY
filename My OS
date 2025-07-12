@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI and Company OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .screen-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .notification-panel {
+            transform: translateY(-100%);
+            transition: transform 0.3s ease-out;
+        }
+        .notification-panel.open {
+            transform: translateY(0);
+        }
+        .control-center {
+            transform: translateY(100%);
+            transition: transform 0.3s ease-out;
+        }
+        .control-center.open {
+            transform: translateY(0);
+        }
+        .app-icon {
+            transition: all 0.2s ease;
+        }
+        .app-icon:active {
+            transform: scale(0.9);
+        }
+        .dark-theme {
+            --bg-primary: #121212;
+            --bg-secondary: #1E1E1E;
+            --text-primary: #FFFFFF;
+            --text-secondary: #BBBBBB;
+            --accent-color: #4F46E5;
+        }
+        .light-theme {
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F5F5F5;
+            --text-primary: #121212;
+            --text-secondary: #555555;
+            --accent-color: #4F46E5;
+        }
+    </style>
+</head>
+<body class="dark-theme bg-primary text-primary font-sans overflow-hidden select-none">
+    <!-- Startup Screen -->
+    <div id="startup-screen" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center">
+        <div class="float-animation mb-8">
+            <div class="w-32 h-32 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                <i class="fas fa-robot text-white text-5xl"></i>
+            </div>
+        </div>
+        <h1 class="text-4xl font-bold mb-2 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">AI and Company</h1>
+        <p class="text-gray-400 mb-8">The future of computing</p>
+        <div class="w-64 h-1 bg-gray-800 rounded-full overflow-hidden">
+            <div id="loading-bar" class="h-full bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- Lock Screen -->
+    <div id="lock-screen" class="fixed inset-0 bg-gradient-to-b from-gray-900 to-gray-800 z-40 flex flex-col items-center justify-end pb-16 hidden">
+        <div class="text-center mb-8">
+            <div class="text-2xl font-light mb-1" id="lock-time">12:34</div>
+            <div class="text-lg" id="lock-date">Monday, June 12</div>
+        </div>
+        <div class="w-12 h-12 rounded-full border-2 border-white flex items-center justify-center mb-8">
+            <i class="fas fa-fingerprint text-white"></i>
+        </div>
+        <div class="text-gray-400">Touch ID or swipe up to unlock</div>
+        <div class="absolute bottom-4 left-0 right-0 flex justify-center">
+            <div class="w-32 h-1 bg-white rounded-full"></div>
+        </div>
+    </div>
+
+    <!-- Home Screen -->
+    <div id="home-screen" class="fixed inset-0 bg-primary z-30 hidden">
+        <!-- Status Bar -->
+        <div class="flex justify-between items-center px-4 py-2">
+            <div class="text-sm font-medium" id="current-time">12:34</div>
+            <div class="flex space-x-2">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+        </div>
+
+        <!-- App Grid -->
+        <div class="grid grid-cols-4 gap-6 p-4 mt-4">
+            <!-- Row 1 -->
+            <div class="app-icon flex flex-col items-center" onclick="openApp('ai-terminal')">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-1">
+                    <i class="fas fa-terminal text-white text-2xl"></i>
+                </div>
+                <span class="text-xs">AI Terminal</span>
+            </div>
+            <div class="app-icon flex flex-col items-center" onclick="openApp('file-explorer')">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center mb-1">
+                    <i class="fas fa-folder text-white text-2xl"></i>
+                </div>
+                <span class="text-xs">Files</span>
+            </div>
+            <div class="app-icon flex flex-col items-center" onclick="openApp('browser')">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-teal-400 flex items-center justify-center mb-1">
+                    <i class="fas fa-globe text-white text-2xl"></i>
+                </div>
+                <span class="text-xs">Browser</span>
+            </div>
+            <div class="app-icon flex flex-col items-center" onclick="openApp('camera')">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center mb-1">
+                    <i class="fas fa-camera text-white text-2xl"></i>
+                </div>
+                <span class="text-xs">Camera</span>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="app-icon flex flex-col items-center" onclick="openApp('photos')">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center mb-1">
+                    <i class="fas fa-images text-white text-2xl"></i>
+                </div>
+                <span class="text-xs">Photos</span>
+            </div>
+            <div class="app-icon flex flex-col items-center" onclick="openApp('messages')">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-1">
+                    <i class="fas fa-comment-dots text-white text-2xl"></i>
+                </div>
+                <span class="text-xs">Messages</span>
+            </div>
+            <div class="app-icon flex flex-col items-center" onclick="openApp('notes')">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-400 flex items-center justify-center mb-1">
+                    <i class="fas fa-sticky-note text-white text-2xl"></i>
+                </div>
+                <span class="text-xs">Notes</span>
+            </div>
+            <div class="app-icon flex flex-col items-center" onclick="openApp('calendar')">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center mb-1">
+                    <i class="fas fa-calendar text-white text-2xl"></i>
+                </div>
+                <span class="text-xs">Calendar</span>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="app-icon flex flex-col items-center" onclick="openApp('app-store')">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center mb-1">
+                    <i class="fas fa-shopping-bag text-white text-2xl"></i>
+                </div>
+                <span class="text-xs">App Store</span>
+            </div>
+            <div class="app-icon flex flex-col items-center" onclick="openApp('settings')">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-500 to-gray-700 flex items-center justify-center mb-1">
+                    <i class="fas fa-cog text-white text-2xl"></i>
+                </div>
+                <span class="text-xs">Settings</span>
+            </div>
+            <div class="app-icon flex flex-col items-center" onclick="openApp('music')">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center mb-1">
+                    <i class="fas fa-music text-white text-2xl"></i>
+                </div>
+                <span class="text-xs">Music</span>
+            </div>
+            <div class="app-icon flex flex-col items-center" onclick="openApp('maps')">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mb-1">
+                    <i class="fas fa-map-marked-alt text-white text-2xl"></i>
+                </div>
+                <span class="text-xs">Maps</span>
+            </div>
+        </div>
+
+        <!-- Widget Area -->
+        <div class="mx-4 mt-4 p-4 bg-secondary rounded-2xl">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="font-medium">Today</h3>
+                <span class="text-xs text-gray-400">June 12</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-800 p-3 rounded-xl">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center mr-2">
+                            <i class="fas fa-calendar-day text-white text-xs"></i>
+                        </div>
+                        <span class="text-xs">Events</span>
+                    </div>
+                    <p class="text-xs text-gray-400">No events today</p>
+                </div>
+                <div class="bg-gray-800 p-3 rounded-xl">
+                    <div class="flex items-center mb-2">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-2">
+                            <i class="fas fa-cloud-sun text-white text-xs"></i>
+                        </div>
+                        <span class="text-xs">Weather</span>
+                    </div>
+                    <p class="text-xs text-gray-400">72°F • Sunny</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dock -->
+        <div class="absolute bottom-4 left-0 right-0 flex justify-center">
+            <div class="bg-gray-800 bg-opacity-70 backdrop-blur-lg rounded-2xl p-2 flex items-center">
+                <div class="app-icon flex flex-col items-center mx-2" onclick="openApp('phone')">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mb-1">
+                        <i class="fas fa-phone text-white text-xl"></i>
+                    </div>
+                </div>
+                <div class="app-icon flex flex-col items-center mx-2" onclick="openApp('assistant')">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center mb-1">
+                        <i class="fas fa-robot text-white text-xl"></i>
+                    </div>
+                </div>
+                <div class="app-icon flex flex-col items-center mx-2" onclick="openApp('messages')">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-1">
+                        <i class="fas fa-envelope text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="absolute bottom-0 left-0 right-0 bg-gray-900 bg-opacity-90 backdrop-blur-lg flex justify-around items-center py-3">
+            <button class="text-gray-400" onclick="showHome()">
+                <i class="fas fa-home text-xl"></i>
+            </button>
+            <button class="text-gray-400" onclick="openApp('assistant')">
+                <i class="fas fa-search text-xl"></i>
+            </button>
+            <button class="text-gray-400" onclick="showControlCenter()">
+                <i class="fas fa-sliders-h text-xl"></i>
+            </button>
+            <button class="text-gray-400" onclick="showAppSwitcher()">
+                <i class="fas fa-window-restore text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification Panel -->
+    <div id="notification-panel" class="notification-panel fixed inset-0 bg-gray-900 bg-opacity-90 backdrop-blur-lg z-50 pt-12 px-4">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-medium">Notifications</h2>
+            <button onclick="hideNotificationPanel()" class="text-gray-400">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-3 mb-6">
+            <div class="bg-gray-800 p-3 rounded-xl">
+                <div class="flex items-start">
+                    <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-calendar text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-medium">Meeting Reminder</h3>
+                        <p class="text-sm text-gray-400">Team sync in 15 minutes</p>
+                    </div>
+                    <span class="text-xs text-gray-500">10:45 AM</span>
+                </div>
+            </div>
+            <div class="bg-gray-800 p-3 rounded-xl">
+                <div class="flex items-start">
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-envelope text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-medium">New Message</h3>
+                        <p class="text-sm text-gray-400">From: Sarah Johnson</p>
+                    </div>
+                    <span class="text-xs text-gray-500">9:30 AM</span>
+                </div>
+            </div>
+            <div class="bg-gray-800 p-3 rounded-xl">
+                <div class="flex items-start">
+                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-cloud text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-medium">Backup Complete</h3>
+                        <p class="text-sm text-gray-400">All files are now secure</p>
+                    </div>
+                    <span class="text-xs text-gray-500">Yesterday</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-6">
+            <h3 class="text-lg font-medium mb-3">Quick Settings</h3>
+            <div class="grid grid-cols-4 gap-3">
+                <button class="bg-gray-800 p-3 rounded-xl flex flex-col items-center">
+                    <div class="w-12 h-12 bg-blue-500 bg-opacity-20 rounded-full flex items-center justify-center mb-1">
+                        <i class="fas fa-wifi text-blue-400"></i>
+                    </div>
+                    <span class="text-xs">Wi-Fi</span>
+                </button>
+                <button class="bg-gray-800 p-3 rounded-xl flex flex-col items-center">
+                    <div class="w-12 h-12 bg-blue-500 bg-opacity-20 rounded-full flex items-center justify-center mb-1">
+                        <i class="fas fa-bluetooth-b text-blue-400"></i>
+                    </div>
+                    <span class="text-xs">Bluetooth</span>
+                </button>
+                <button class="bg-gray-800 p-3 rounded-xl flex flex-col items-center">
+                    <div class="w-12 h-12 bg-green-500 bg-opacity-20 rounded-full flex items-center justify-center mb-1">
+                        <i class="fas fa-mobile-alt text-green-400"></i>
+                    </div>
+                    <span class="text-xs">Cellular</span>
+                </button>
+                <button class="bg-gray-800 p-3 rounded-xl flex flex-col items-center">
+                    <div class="w-12 h-12 bg-purple-500 bg-opacity-20 rounded-full flex items-center justify-center mb-1">
+                        <i class="fas fa-moon text-purple-400"></i>
+                    </div>
+                    <span class="text-xs">Dark Mode</span>
+                </button>
+                <button class="bg-gray-800 p-3 rounded-xl flex flex-col items-center">
+                    <div class="w-12 h-12 bg-red-500 bg-opacity-20 rounded-full flex items-center justify-center mb-1">
+                        <i class="fas fa-battery-three-quarters text-red-400"></i>
+                    </div>
+                    <span class="text-xs">Battery Saver</span>
+                </button>
+                <button class="bg-gray-800 p-3 rounded-xl flex flex-col items-center">
+                    <div class="w-12 h-12 bg-yellow-500 bg-opacity-20 rounded-full flex items-center justify-center mb-1">
+                        <i class="fas fa-volume-up text-yellow-400"></i>
+                    </div>
+                    <span class="text-xs">Sound</span>
+                </button>
+                <button class="bg-gray-800 p-3 rounded-xl flex flex-col items-center">
+                    <div class="w-12 h-12 bg-indigo-500 bg-opacity-20 rounded-full flex items-center justify-center mb-1">
+                        <i class="fas fa-location-arrow text-indigo-400"></i>
+                    </div>
+                    <span class="text-xs">Location</span>
+                </button>
+                <button class="bg-gray-800 p-3 rounded-xl flex flex-col items-center">
+                    <div class="w-12 h-12 bg-pink-500 bg-opacity-20 rounded-full flex items-center justify-center mb-1">
+                        <i class="fas fa-air-freshener text-pink-400"></i>
+                    </div>
+                    <span class="text-xs">Airplane</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Control Center -->
+    <div id="control-center" class="control-center fixed inset-0 bg-gray-900 bg-opacity-90 backdrop-blur-lg z-50 flex flex-col items-center justify-end pb-24">
+        <div class="w-12 h-1 bg-gray-600 rounded-full mb-4"></div>
+        
+        <div class="w-full px-4 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center">
+                    <i class="fas fa-music mr-2 text-gray-400"></i>
+                    <span class="font-medium">Now Playing</span>
+                </div>
+                <div class="flex">
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+                </div>
+            </div>
+            
+            <div class="bg-gray-800 rounded-2xl p-4 flex items-center">
+                <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mr-3">
+                    <i class="fas fa-music text-white"></i>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-medium">Current Song</h3>
+                    <p class="text-sm text-gray-400">Artist Name</p>
+                </div>
+                <div class="flex space-x-4">
+                    <button class="text-gray-400">
+                        <i class="fas fa-step-backward"></i>
+                    </button>
+                    <button class="text-gray-400">
+                        <i class="fas fa-pause"></i>
+                    </button>
+                    <button class="text-gray-400">
+                        <i class="fas fa-step-forward"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="w-full px-4 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <span class="font-medium">Brightness</span>
+            </div>
+            <div class="bg-gray-800 rounded-full h-3 flex items-center px-1">
+                <div class="bg-blue-400 h-2 rounded-full" style="width: 70%"></div>
+                <div class="w-4 h-4 bg-white rounded-full shadow-md -ml-2"></div>
+            </div>
+        </div>
+        
+        <div class="w-full px-4 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <span class="font-medium">Volume</span>
+            </div>
+            <div class="bg-gray-800 rounded-full h-3 flex items-center px-1">
+                <div class="bg-blue-400 h-2 rounded-full" style="width: 50%"></div>
+                <div class="w-4 h-4 bg-white rounded-full shadow-md -ml-2"></div>
+            </div>
+        </div>
+        
+        <div class="w-full px-4">
+            <div class="grid grid-cols-4 gap-4">
+                <button class="bg-gray-800 p-4 rounded-xl flex flex-col items-center">
+                    <div class="w-12 h-12 bg-blue-500 bg-opacity-20 rounded-full flex items-center justify-center mb-2">
+                        <i class="fas fa-lightbulb text-blue-400"></i>
+                    </div>
+                    <span class="text-xs">Flashlight</span>
+                </button>
+                <button class="bg-gray-800 p-4 rounded-xl flex flex-col items-center">
+                    <div class="w-12 h-12 bg-green-500 bg-opacity-20 rounded-full flex items-center justify-center mb-2">
+                        <i class="fas fa-camera text-green-400"></i>
+                    </div>
+                    <span class="text-xs">Camera</span>
+                </button>
+                <button class="bg-gray-800 p-4 rounded-xl flex flex-col items-center">
+                    <div class="w-12 h-12 bg-purple-500 bg-opacity-20 rounded-full flex items-center justify-center mb-2">
+                        <i class="fas fa-calculator text-purple-400"></i>
+                    </div>
+                    <span class="text-xs">Calculator</span>
+                </button>
+                <button class="bg-gray-800 p-4 rounded-xl flex flex-col items-center">
+                    <div class="w-12 h-12 bg-red-500 bg-opacity-20 rounded-full flex items-center justify-center mb-2">
+                        <i class="fas fa-stopwatch text-red-400"></i>
+                    </div>
+                    <span class="text-xs">Timer</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Terminal App -->
+    <div id="ai-terminal" class="fixed inset-0 bg-gray-900 z-40 hidden flex flex-col">
+        <div class="flex items-center justify-between p-4 border-b border-gray-800">
+            <button onclick="closeApp('ai-terminal')" class="text-gray-400">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h2 class="font-medium">AI Terminal</h2>
+            <div class="w-6"></div>
+        </div>
+        
+        <div class="flex-1 p-4 overflow-y-auto" id="terminal-output">
+            <div class="mb-4">
+                <div class="text-green-400 mb-1">AI BOTHA v3.2.1</div>
+                <div class="text-gray-400 text-sm">Type "help" for available commands</div>
+            </div>
+            <div class="mb-4">
+                <div class="flex">
+                    <span class="text-blue-400 mr-2">user@ai-os:~$</span>
+                    <span>help</span>
+                </div>
+                <div class="mt-2 text-gray-300">
+                    <div>Available commands:</div>
+                    <div class="ml-4">
+                        <div>- help: Show this help message</div>
+                        <div>- apps: List available applications</div>
+                        <div>- open [app]: Launch an application</div>
+                        <div>- search [query]: Web search</div>
+                        <div>- clear: Clear terminal</div>
+                        <div>- theme [light/dark]: Change UI theme</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4 border-t border-gray-800">
+            <div class="flex items-center bg-gray-800 rounded-lg px-3 py-2">
+                <span class="text-blue-400 mr-2">user@ai-os:~$</span>
+                <input type="text" id="terminal-input" class="bg-transparent flex-1 outline-none" placeholder="Type command..." onkeypress="handleTerminalInput(event)">
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings App -->
+    <div id="settings" class="fixed inset-0 bg-primary z-40 hidden flex flex-col">
+        <div class="flex items-center justify-between p-4 border-b border-gray-800">
+            <button onclick="closeApp('settings')" class="text-gray-400">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h2 class="font-medium">Settings</h2>
+            <div class="w-6"></div>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto">
+            <div class="p-4">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center mr-3">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-medium">User Profile</h3>
+                        <p class="text-sm text-gray-400">Manage account settings</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="space-y-1 px-4">
+                <div class="py-3 border-b border-gray-800">
+                    <h3 class="font-medium mb-2">General</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-moon mr-3 text-gray-400"></i>
+                                <span>Dark Mode</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-bell mr-3 text-gray-400"></i>
+                                <span>Notifications</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-fingerprint mr-3 text-gray-400"></i>
+                                <span>Biometric Login</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="py-3 border-b border-gray-800">
+                    <h3 class="font-medium mb-2">Display</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-sun mr-3 text-gray-400"></i>
+                                <span>Brightness</span>
+                            </div>
+                            <span class="text-gray-400">Auto</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-text-height mr-3 text-gray-400"></i>
+                                <span>Font Size</span>
+                            </div>
+                            <span class="text-gray-400">Medium</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-clock mr-3 text-gray-400"></i>
+                                <span>Screen Timeout</span>
+                            </div>
+                            <span class="text-gray-400">2 minutes</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="py-3 border-b border-gray-800">
+                    <h3 class="font-medium mb-2">Sound</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-volume-up mr-3 text-gray-400"></i>
+                                <span>Ringtone</span>
+                            </div>
+                            <span class="text-gray-400">Digital</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-bell mr-3 text-gray-400"></i>
+                                <span>Notification Sound</span>
+                            </div>
+                            <span class="text-gray-400">Chime</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-vibrate mr-3 text-gray-400"></i>
+                                <span>Vibration</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="py-3">
+                    <h3 class="font-medium mb-2">About</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle mr-3 text-gray-400"></i>
+                                <span>AI and Company OS</span>
+                            </div>
+                            <span class="text-gray-400">v3.2.1</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-shield-alt mr-3 text-gray-400"></i>
+                                <span>Security Update</span>
+                            </div>
+                            <span class="text-gray-400">June 2023</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <i class="fas fa-mobile-alt mr-3 text-gray-400"></i>
+                                <span>Device Model</span>
+                            </div>
+                            <span class="text-gray-400">AI-X1</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Store -->
+    <div id="app-store" class="fixed inset-0 bg-primary z-40 hidden flex flex-col">
+        <div class="flex items-center justify-between p-4 border-b border-gray-800">
+            <button onclick="closeApp('app-store')" class="text-gray-400">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h2 class="font-medium">App Store</h2>
+            <div class="w-6"></div>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto">
+            <div class="p-4">
+                <div class="relative mb-6">
+                    <input type="text" placeholder="Search apps..." class="w-full bg-gray-800 rounded-full py-2 px-4 pl-10 outline-none">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="font-medium mb-3">Featured Apps</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-800 rounded-xl p-3">
+                            <div class="w-full h-32 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg mb-2 flex items-center justify-center">
+                                <i class="fas fa-gamepad text-white text-3xl"></i>
+                            </div>
+                            <h4 class="font-medium text-sm mb-1">AI Games</h4>
+                            <p class="text-xs text-gray-400 mb-2">Interactive gaming</p>
+                            <button class="w-full bg-blue-500 text-white py-1 rounded-lg text-xs">Install</button>
+                        </div>
+                        <div class="bg-gray-800 rounded-xl p-3">
+                            <div class="w-full h-32 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg mb-2 flex items-center justify-center">
+                                <i class="fas fa-video text-white text-3xl"></i>
+                            </div>
+                            <h4 class="font-medium text-sm mb-1">Stream Pro</h4>
+                            <p class="text-xs text-gray-400 mb-2">Video streaming</p>
+                            <button class="w-full bg-blue-500 text-white py-1 rounded-lg text-xs">Install</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="font-medium mb-3">Recommended For You</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center bg-gray-800 rounded-xl p-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-headphones text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-sm mb-1">Music AI</h4>
+                                <p class="text-xs text-gray-400">Smart music player</p>
+                            </div>
+                            <button class="bg-blue-500 text-white py-1 px-3 rounded-lg text-xs">Install</button>
+                        </div>
+                        <div class="flex items-center bg-gray-800 rounded-xl p-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-newspaper text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-sm mb-1">News Digest</h4>
+                                <p class="text-xs text-gray-400">Personalized news</p>
+                            </div>
+                            <button class="bg-blue-500 text-white py-1 px-3 rounded-lg text-xs">Install</button>
+                        </div>
+                        <div class="flex items-center bg-gray-800 rounded-xl p-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-heartbeat text-white"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-sm mb-1">Health Tracker</h4>
+                                <p class="text-xs text-gray-400">Fitness monitoring</p>
+                            </div>
+                            <button class="bg-blue-500 text-white py-1 px-3 rounded-lg text-xs">Install</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="font-medium mb-3">Top Free</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <span class="text-gray-400 mr-3">1</span>
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-comments text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-sm">Chat Connect</h4>
+                                <p class="text-xs text-gray-400">Messaging</p>
+                            </div>
+                            <button class="bg-gray-700 text-white py-1 px-3 rounded-lg text-xs">Get</button>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-400 mr-3">2</span>
+                            <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-camera-retro text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-sm">Photo Magic</h4>
+                                <p class="text-xs text-gray-400">Photo editor</p>
+                            </div>
+                            <button class="bg-gray-700 text-white py-1 px-3 rounded-lg text-xs">Get</button>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-400 mr-3">3</span>
+                            <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-wallet text-white text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-medium text-sm">Pay Secure</h4>
+                                <p class="text-xs text-gray-400">Mobile payments</p>
+                            </div>
+                            <button class="bg-gray-700 text-white py-1 px-3 rounded-lg text-xs">Get</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Assistant -->
+    <div id="assistant" class="fixed inset-0 bg-primary z-40 hidden flex flex-col">
+        <div class="flex items-center justify-between p-4 border-b border-gray-800">
+            <button onclick="closeApp('assistant')" class="text-gray-400">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h2 class="font-medium">AI BOTHA</h2>
+            <div class="w-6"></div>
+        </div>
+        
+        <div class="flex-1 p-4 overflow-y-auto" id="assistant-chat">
+            <div class="flex mb-4">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-robot text-white"></i>
+                </div>
+                <div class="bg-gray-800 rounded-2xl p-3 max-w-xs">
+                    <p>Hello! I'm AI BOTHA, your virtual assistant. How can I help you today?</p>
+                </div>
+            </div>
+            
+            <div class="flex mb-4 justify-end">
+                <div class="bg-blue-500 rounded-2xl p-3 max-w-xs">
+                    <p>What can you do?</p>
+                </div>
+            </div>
+            
+            <div class="flex mb-4">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-robot text-white"></i>
+                </div>
+                <div class="bg-gray-800 rounded-2xl p-3 max-w-xs">
+                    <p>I can answer questions, open apps, set reminders, control your device, and much more! Try asking me something.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4 border-t border-gray-800">
+            <div class="flex items-center">
+                <button class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center mr-2">
+                    <i class="fas fa-microphone text-gray-400"></i>
+                </button>
+                <input type="text" id="assistant-input" class="bg-gray-800 rounded-full py-2 px-4 flex-1 outline-none" placeholder="Ask AI BOTHA..." onkeypress="handleAssistantInput(event)">
+                <button class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center ml-2">
+                    <i class="fas fa-paper-plane text-white"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Switcher -->
+    <div id="app-switcher" class="fixed inset-0 bg-gray-900 bg-opacity-90 backdrop-blur-lg z-50 hidden flex flex-col items-center justify-end pb-24">
+        <div class="w-12 h-1 bg-gray-600 rounded-full mb-4"></div>
+        
+        <div class="w-full px-4 mb-4">
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-gray-800 rounded-xl h-32 flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-terminal text-white text-xl"></i>
+                    </div>
+                </div>
+                <div class="bg-gray-800 rounded-xl h-32 flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
+                        <i class="fas fa-folder text-white text-xl"></i>
+                    </div>
+                </div>
+                <div class="bg-gray-800 rounded-xl h-32 flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-teal-400 flex items-center justify-center">
+                        <i class="fas fa-globe text-white text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="w-full px-4">
+            <button class="w-full bg-gray-800 py-3 rounded-xl text-center font-medium" onclick="hideAppSwitcher()">
+                Close All
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Simulate startup sequence
+        setTimeout(() => {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    document.getElementById('loading-bar').style.width = '100%';
+                    setTimeout(() => {
+                        document.getElementById('startup-screen').classList.add('hidden');
+                        document.getElementById('lock-screen').classList.remove('hidden');
+                        updateDateTime();
+                    }, 500);
+                } else {
+                    document.getElementById('loading-bar').style.width = `${progress}%`;
+                }
+            }, 200);
+        }, 1000);
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const dateStr = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+            
+            document.getElementById('lock-time').textContent = timeStr;
+            document.getElementById('lock-date').textContent = dateStr;
+            document.getElementById('current-time').textContent = timeStr;
+        }
+
+        setInterval(updateDateTime, 1000);
+
+        // Handle lock screen swipe
+        let startY = 0;
+        const lockScreen = document.getElementById('lock-screen');
+        
+        lockScreen.addEventListener('touchstart', (e) => {
+            startY = e.touches[0].clientY;
+        }, false);
+        
+        lockScreen.addEventListener('touchmove', (e) => {
+            const y = e.touches[0].clientY;
+            if (startY - y > 50) { // Swipe up
+                unlockDevice();
+            }
+        }, false);
+        
+        lockScreen.addEventListener('touchend', () => {
+            startY = 0;
+        }, false);
+
+        function unlockDevice() {
+            lockScreen.classList.add('hidden');
+            document.getElementById('home-screen').classList.remove('hidden');
+        }
+
+        // Show notification panel
+        function showNotificationPanel() {
+            document.getElementById('notification-panel').classList.add('open');
+        }
+
+        function hideNotificationPanel() {
+            document.getElementById('notification-panel').classList.remove('open');
+        }
+
+        // Show control center
+        function showControlCenter() {
+            document.getElementById('control-center').classList.add('open');
+        }
+
+        function hideControlCenter() {
+            document.getElementById('control-center').classList.remove('open');
+        }
+
+        // App switcher
+        function showAppSwitcher() {
+            document.getElementById('app-switcher').classList.remove('hidden');
+        }
+
+        function hideAppSwitcher() {
+            document.getElementById('app-switcher').classList.add('hidden');
+        }
+
+        // App management
+        function openApp(appId) {
+            document.getElementById('home-screen').classList.add('hidden');
+            document.getElementById(appId).classList.remove('hidden');
+        }
+
+        function closeApp(appId) {
+            document.getElementById(appId).classList.add('hidden');
+            document.getElementById('home-screen').classList.remove('hidden');
+        }
+
+        function showHome() {
+            // Close all apps
+            document.querySelectorAll('[id$="-app"]').forEach(el => {
+                el.classList.add('hidden');
+            });
+            document.getElementById('home-screen').classList.remove('hidden');
+        }
+
+        // Terminal input handler
+        function handleTerminalInput(e) {
+            if (e.key === 'Enter') {
+                const input = document.getElementById('terminal-input');
+                const command = input.value.trim();
+                input.value = '';
+                
+                const output = document.getElementById('terminal-output');
+                
+                // Add user command to output
+                const userCommand = document.createElement('div');
+                userCommand.className = 'flex mb-2';
+                userCommand.innerHTML = `
+                    <span class="text-blue-400 mr-2">user@ai-os:~$</span>
+                    <span>${command}</span>
+                `;
+                output.appendChild(userCommand);
+                
+                // Process command
+                let response = '';
+                switch (command.toLowerCase()) {
+                    case 'help':
+                        response = `
+                            <div>Available commands:</div>
+                            <div class="ml-4">
+                                <div>- help: Show this help message</div>
+                                <div>- apps: List available applications</div>
+                                <div>- open [app]: Launch an application</div>
+                                <div>- search [query]: Web search</div>
+                                <div>- clear: Clear terminal</div>
+                                <div>- theme [light/dark]: Change UI theme</div>
+                            </div>
+                        `;
+                        break;
+                    case 'apps':
+                        response = `
+                            <div>Available applications:</div>
+                            <div class="ml-4">
+                                <div>- terminal</div>
+                                <div>- files</div>
+                                <div>- browser</div>
+                                <div>- settings</div>
+                                <div>- assistant</div>
+                                <div>- appstore</div>
+                            </div>
+                        `;
+                        break;
+                    case 'clear':
+                        output.innerHTML = `
+                            <div class="mb-4">
+                                <div class="text-green-400 mb-1">AI BOTHA v3.2.1</div>
+                                <div class="text-gray-400 text-sm">Type "help" for available commands</div>
+                            </div>
+                        `;
+                        return;
+                    case 'theme dark':
+                        document.body.classList.remove('light-theme');
+                        document.body.classList.add('dark-theme');
+                        response = 'Switched to dark theme';
+                        break;
+                    case 'theme light':
+                        document.body.classList.remove('dark-theme');
+                        document.body.classList.add('light-theme');
+                        response = 'Switched to light theme';
+                        break;
+                    case 'open terminal':
+                        closeApp('ai-terminal');
+                        openApp('ai-terminal');
+                        return;
+                    case 'open settings':
+                        closeApp('ai-terminal');
+                        openApp('settings');
+                        return;
+                    case 'open assistant':
+                        closeApp('ai-terminal');
+                        openApp('assistant');
+                        return;
+                    case 'open appstore':
+                        closeApp('ai-terminal');
+                        openApp('app-store');
+                        return;
+                    default:
+                        if (command.startsWith('open ')) {
+                            response = `Unknown application: ${command.substring(5)}`;
+                        } else if (command.startsWith('search ')) {
+                            response = `Searching the web for: ${command.substring(7)}`;
+                        } else {
+                            response = `Command not found: ${command}. Type "help" for available commands.`;
+                        }
+                }
+                
+                const commandResponse = document.createElement('div');
+                commandResponse.className = 'text-gray-300 mb-4';
+                commandResponse.innerHTML = response;
+                output.appendChild(commandResponse);
+                
+                // Scroll to bottom
+                output.scrollTop = output.scrollHeight;
+            }
+        }
+
+        // Assistant input handler
+        function handleAssistantInput(e) {
+            if (e.key === 'Enter') {
+                const input = document.getElementById('assistant-input');
+                const message = input.value.trim();
+                input.value = '';
+                
+                const chat = document.getElementById('assistant-chat');
+                
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'flex mb-4 justify-end';
+                userMessage.innerHTML = `
+                    <div class="bg-blue-500 rounded-2xl p-3 max-w-xs">
+                        <p>${message}</p>
+                    </div>
+                `;
+                chat.appendChild(userMessage);
+                
+                // Process message
+                let response = '';
+                if (message.toLowerCase().includes('hello') || message.toLowerCase().includes('hi')) {
+                    response = 'Hello there! How can I assist you today?';
+                } else if (message.toLowerCase().includes('time')) {
+                    const now = new Date();
+                    response = `The current time is ${now.toLocaleTimeString()}.`;
+                } else if (message.toLowerCase().includes('date')) {
+                    const now = new Date();
+                    response = `Today is ${now.toLocaleDateString()}.`;
+                } else if (message.toLowerCase().includes('open') && message.toLowerCase().includes('app')) {
+                    const appMatch = message.match(/open (.*)/i);
+                    if (appMatch) {
+                        const appName = appMatch[1].toLowerCase();
+                        if (appName.includes('terminal')) {
+                            closeApp('assistant');
+                            openApp('ai-terminal');
+                            return;
+                        } else if (appName.includes('settings')) {
+                            closeApp('assistant');
+                            openApp('settings');
+                            return;
+                        } else if (appName.includes('store')) {
+                            closeApp('assistant');
+                            openApp('app-store');
+                            return;
+                        } else {
+                            response = `I can't find the app "${appName}". Try being more specific.`;
+                        }
+                    } else {
+                        response = 'Which app would you like me to open?';
+                    }
+                } else {
+                    response = 'I understand you asked about "' + message + '". As an AI assistant, I can help with opening apps, answering questions, and more.';
+                }
+                
+                // Add assistant response
+                setTimeout(() => {
+                    const assistantResponse = document.createElement('div');
+                    assistantResponse.className = 'flex mb-4';
+                    assistantResponse.innerHTML = `
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mr-3">
+                            <i class="fas fa-robot text-white"></i>
+                        </div>
+                        <div class="bg-gray-800 rounded-2xl p-3 max-w-xs">
+                            <p>${response}</p>
+                        </div>
+                    `;
+                    chat.appendChild(assistantResponse);
+                    
+                    // Scroll to bottom
+                    chat.scrollTop = chat.scrollHeight;
+                }, 500);
+            }
+        }
+
+        // Swipe down for notifications
+        let touchStartY = 0;
+        const homeScreen = document.getElementById('home-screen');
+        
+        homeScreen.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, false);
+        
+        homeScreen.addEventListener('touchmove', (e) => {
+            const y = e.touches[0].clientY;
+            if (y - touchStartY > 50 && window.scrollY <= 0) { // Swipe down
+                showNotificationPanel();
+            }
+        }, false);
+        
+        homeScreen.addEventListener('touchend', () => {
+            touchStartY = 0;
+        }, false);
+
+        // Swipe up for control center
+        homeScreen.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, false);
+        
+        homeScreen.addEventListener('touchmove', (e) => {
+            const y = e.touches[0].clientY;
+            if (touchStartY - y > 50 && window.scrollY >= document.body.scrollHeight - window.innerHeight) { // Swipe up
+                showControlCenter();
+            }
+        }, false);
+    </script>
+</body>
+</html>
